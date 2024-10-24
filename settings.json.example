@@ -1,5 +1,7 @@
 {
   "tg_bot_api_key": "your_key_is_here",
   "log_level": "info",
-  "allowed_usernames": []
+  "allowed_usernames": [],
+  "radarr_host_url": "",
+  "radarr_api_key": ""
 }
