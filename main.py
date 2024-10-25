@@ -1,3 +1,4 @@
+import sys
 import json
 import telebot
 import logging
@@ -18,9 +19,14 @@ def check_access(bot, message):
 
 logger = logging.getLogger(__name__)
 log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
+logging.basicConfig(level=logging.INFO)
 
-with open('settings.json', 'r') as file:
-    settings = json.load(file)
+try:
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+except FileNotFoundError:
+    logger.error("You should have correct 'settings.json' file. Please refer to 'settings.json.example' to fill it.")
+    sys.exit(1)
 
 # set telegram bot api key
 tg_bot_api_key = settings['tg_bot_api_key']
