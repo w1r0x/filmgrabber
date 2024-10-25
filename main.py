@@ -8,6 +8,13 @@ from myradarr import *
 def check_allowed_usernames(username):
     return username in allowed_usernames
 
+def check_access(bot, message):
+    if not check_allowed_usernames(message.from_user.username):
+        logger.debug(f'User "{message.from_user.username}" is not in the user whitelist')
+        bot.send_message(message.from_user.id, "К сожалению у вас нет доступа к боту")
+        return False
+    return True
+
 
 logger = logging.getLogger(__name__)
 log_levels = {'info': logging.INFO, 'debug': logging.DEBUG}
@@ -35,8 +42,7 @@ radarr = RadarrAPI(radarr_host_url, radarr_api_key)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    if not check_allowed_usernames(message.from_user.username):
-        bot.send_message(message.from_user.id, "К сожалению у вас нет доступа к боту")
+    if not check_access(bot, message):
         return
     logger.debug(f'Received start from "{message.from_user.username}"')
     bot.send_message(message.from_user.id, "👋 Привет! Я скачаю за тебя фильмы и сериалы с торрентов, просто пиши мне название фильма")
@@ -44,8 +50,7 @@ def start(message):
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if not check_allowed_usernames(message.from_user.username):
-        bot.send_message(message.from_user.id, "К сожалению у вас нет доступа к боту")
+    if not check_access(bot, message):
         return
     logger.debug(f'Received message from "{message.from_user.username}"')
     movies = find_movies(radarr, message.text)
