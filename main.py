@@ -9,6 +9,7 @@ from myradarr import *
 def check_allowed_usernames(username):
     return username in allowed_usernames
 
+
 def check_access(bot, message):
     if not check_allowed_usernames(message.from_user.username):
         logger.debug(f'User "{message.from_user.username}" is not in the user whitelist')
@@ -43,6 +44,9 @@ allowed_usernames = settings['allowed_usernames']
 radarr_host_url = settings['radarr_host_url']
 radarr_api_key = settings['radarr_api_key']
 
+# get config for no_poster_image_policy
+no_poster_image_policy = settings['no_poster_image_policy']
+
 # Instantiate RadarrAPI
 radarr = RadarrAPI(radarr_host_url, radarr_api_key)
 
@@ -59,7 +63,7 @@ def get_text_messages(message):
     if not check_access(bot, message):
         return
     logger.debug(f'Received message from "{message.from_user.username}"')
-    movies = find_movies(radarr, message.text)
+    movies = find_movies(radarr, message.text, no_poster_image_policy=no_poster_image_policy)
 
     if len(movies) == 0:
         bot.send_message(message.from_user.id, "К сожалению я ничего не нашел(")

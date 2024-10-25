@@ -3,5 +3,6 @@
   "log_level": "info",
   "allowed_usernames": [],
   "radarr_host_url": "",
-  "radarr_api_key": ""
+  "radarr_api_key": "",
+  "no_poster_image_policy": "ignore"
 }
