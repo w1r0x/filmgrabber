@@ -6,6 +6,7 @@ def find_movies(radarr, movie_name):
     for m in movies:
         movie = {}
         movie['title'] = f"{m['title']} ({m['year']})"
+        # TODO: Make image placeholder for no image movies or just not include this
         try:
           movie['image_url'] = m['images'][0]['remoteUrl']
         except KeyError:
