@@ -17,9 +17,16 @@ def find_movies(radarr, movie_name, no_poster_image_policy='ignore'):
         movie['scores'] = ""
         if 'imdb' in m['ratings']:
             movie['scores'] += f"IMDB: {m['ratings']['imdb']['value']}"
+        else:
+            # Skip movie if no IMDB rating
+            continue
         if 'tmdb' in m['ratings']:
-            if len(movie['scores']) != 0: movie['scores'] += " "
+            if len(movie['scores']) != 0:
+                movie['scores'] += " "
             movie['scores'] += f"TMDB: {m['ratings']['tmdb']['value']}"
+        else:
+            # Skip movie if no TMDB rating
+            continue
         if len(movie['scores']) == 0:
             del movie['scores']
         movie['tmdbId'] = m['tmdbId']
