@@ -68,8 +68,10 @@ def get_text_messages(message):
     # TODO: Вытащить в конфиг
     max_messages = 5
 
-    if len(movies) >= max_messages:
+    if len(movies) > max_messages:
         bot.send_message(message.from_user.id, f"Нашел {len(movies)} фильмов, но покажу только {max_messages}")
+
+    # TODO: make function for fare sorting
 
     for m in movies:
         if max_messages == 0:
