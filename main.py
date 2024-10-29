@@ -2,8 +2,7 @@ import sys
 import json
 import telebot
 import logging
-from pyarr import RadarrAPI
-from myradarr import *
+from myradarr import MyRadarr
 
 
 def check_allowed_usernames(username):
@@ -48,7 +47,7 @@ radarr_api_key = settings['radarr_api_key']
 no_poster_image_policy = settings['no_poster_image_policy']
 
 # Instantiate RadarrAPI
-radarr = RadarrAPI(radarr_host_url, radarr_api_key)
+radarr = MyRadarr(radarr_host_url, radarr_api_key)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -63,16 +62,17 @@ def get_text_messages(message):
     if not check_access(bot, message):
         return
     logger.debug(f'Received message from "{message.from_user.username}"')
-    movies = find_movies(radarr, message.text, no_poster_image_policy=no_poster_image_policy)
+
+    # TODO: Вытащить в конфиг
+    max_messages = 5
+
+    movies = radarr.find_movies(message.text, no_poster_image_policy=no_poster_image_policy,limit=max_messages)
 
     if len(movies) == 0:
         bot.send_message(message.from_user.id, "К сожалению я ничего не нашел(")
         return
 
-    # TODO: Вытащить в конфиг
-    max_messages = 5
-
-    if len(movies) > max_messages:
+    if radarr.last_found_movies > max_messages:
         bot.send_message(message.from_user.id, f"Нашел {len(movies)} фильмов, но покажу только {max_messages}")
 
     # TODO: make function for fare sorting
