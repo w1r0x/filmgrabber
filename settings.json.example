@@ -4,5 +4,6 @@
   "allowed_usernames": [],
   "radarr_host_url": "",
   "radarr_api_key": "",
-  "no_poster_image_policy": "ignore"
+  "no_poster_image_policy": "ignore",
+  "kinopoisk.dev_api_key": ""
 }
