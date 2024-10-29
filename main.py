@@ -52,6 +52,7 @@ kp_api_key = settings['kinopoisk.dev_api_key']
 # Instantiate RadarrAPI
 radarr = MyRadarr(radarr_host_url, radarr_api_key, kp_api_key=kp_api_key)
 
+
 @bot.message_handler(commands=['start'])
 def start(message):
     if not check_access(bot, message):
@@ -76,7 +77,8 @@ def get_text_messages(message):
         return
 
     if radarr.last_found_movies > max_messages:
-        bot.send_message(message.from_user.id, f"Нашел {radarr.last_found_movies} фильмов, но покажу только {max_messages}")
+        bot.send_message(message.from_user.id, f"Нашел {radarr.last_found_movies} фильмов, но покажу только \
+                                                     {max_messages}")
 
     # TODO: make function for fare sorting
 

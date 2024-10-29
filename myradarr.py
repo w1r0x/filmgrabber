@@ -1,6 +1,7 @@
 from pyarr import RadarrAPI
 from kpapi import *
 
+
 class MyRadarr(RadarrAPI):
 
     last_found_movies = 0
@@ -39,6 +40,7 @@ class MyRadarr(RadarrAPI):
             if len(movie['scores']) == 0:
                 del movie['scores']
             movie['tmdbId'] = m['tmdbId']
+            movie['imdbId'] = m['imdbId']
             movies_array.append(movie)
 
         movies_array = self._sort_movie_list(movies_array)
@@ -48,13 +50,13 @@ class MyRadarr(RadarrAPI):
         counter = limit
 
         new_movies_array = []
-        for m in movies:
+        for m in movies_array:
             if counter == 0:
                 break
             counter -= 1
 
             try:
-                kp_info = self.kpapi.find_movie_by_imdb_id(m['tmdbId'])
+                kp_info = self.kpapi.find_movie_by_imdb_id(m['imdbId'])
             except KPMovieNotFoundExc:
                 continue
 

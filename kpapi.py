@@ -1,10 +1,12 @@
 import requests
 import json
 
-class KPMovieNotFoundExc:
+
+class KPMovieNotFoundExc(BaseException):
     pass
 
-class KPApi:
+
+class KPApi():
 
     api_key = None
     kinopoisk_dev_url = "https://api.kinopoisk.dev/v1.4"
@@ -45,7 +47,7 @@ class KPApi:
 
         try:
             movie = response["docs"][0]
-        except KeyError:
+        except (KeyError, IndexError):
             raise KPMovieNotFoundExc
 
         return self._get_movie_object(movie)
