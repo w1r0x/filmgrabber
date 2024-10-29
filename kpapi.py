@@ -1,10 +1,8 @@
 import requests
 import json
 
-
-class MovieNotFoundExc:
+class KPMovieNotFoundExc:
     pass
-
 
 class KPApi:
 
@@ -48,6 +46,6 @@ class KPApi:
         try:
             movie = response["docs"][0]
         except KeyError:
-            raise MovieNotFoundExc
+            raise KPMovieNotFoundExc
 
         return self._get_movie_object(movie)
