@@ -46,8 +46,11 @@ radarr_api_key = settings['radarr_api_key']
 # get config for no_poster_image_policy
 no_poster_image_policy = settings['no_poster_image_policy']
 
+# get Kinopoisk.dev API Key
+kp_api_key = settings['kinopoisk.dev_api_key']
+
 # Instantiate RadarrAPI
-radarr = MyRadarr(radarr_host_url, radarr_api_key)
+radarr = MyRadarr(radarr_host_url, radarr_api_key, kp_api_key=kp_api_key)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -73,13 +76,11 @@ def get_text_messages(message):
         return
 
     if radarr.last_found_movies > max_messages:
-        bot.send_message(message.from_user.id, f"Нашел {len(movies)} фильмов, но покажу только {max_messages}")
+        bot.send_message(message.from_user.id, f"Нашел {radarr.last_found_movies} фильмов, но покажу только {max_messages}")
 
     # TODO: make function for fare sorting
 
     for m in movies:
-        if max_messages == 0:
-            break
 
         # Markup for download button
         kb = telebot.types.InlineKeyboardMarkup(row_width=1)
@@ -89,8 +90,6 @@ def get_text_messages(message):
         bot.send_photo(message.from_user.id, photo=m['image_url'], caption=m['title'], reply_markup=kb)
         bot.send_message(message.from_user.id, f"{m['overview']}\n")
         bot.send_message(message.from_user.id, f"{m['scores']}")
-
-        max_messages -= 1
 
 
 @bot.callback_query_handler(func=lambda call: True)
