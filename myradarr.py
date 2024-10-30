@@ -26,6 +26,8 @@ class MyRadarr(RadarrAPI):
             except (KeyError, IndexError):
                 if no_poster_image_policy == 'ignore':
                     continue
+                else:
+                    pass
             movie['overview'] = m['overview']
             movie['scores'] = ""
             if 'imdb' in m['ratings']:
