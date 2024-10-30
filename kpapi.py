@@ -6,6 +6,10 @@ class KPMovieNotFoundExc(BaseException):
     pass
 
 
+class KPIndexNotFoundExc(BaseException):
+    pass
+
+
 class KPApi():
 
     api_key = None
@@ -21,7 +25,7 @@ class KPApi():
         movie["rating"] = kp_api_response["rating"]["kp"]
         try:
             movie["trailer"] = kp_api_response["videos"]["trailers"][0]["url"]
-        except KeyError:
+        except (KeyError, IndexError):
             pass
 
         return movie
@@ -40,14 +44,41 @@ class KPApi():
         # TODO: make exception on invalid API key and other errors
         return json.loads(response.text)
 
-    def find_movie_by_imdb_id(self, imdb_id):
-        request = f"/movie?page=1&limit=1&selectFields=id&selectFields=rating&selectFields=videos&externalId.imdb={imdb_id}"
+    def find_movies_by_imdb_id(self, imdb_id: str | list):
+        request = f"/movie?page=1&selectFields=id&selectFields=rating&selectFields=videos&selectFields=externalId"
+
+        if type(imdb_id) is list:
+            for i in imdb_id:
+                request += f"&externalId.imdb={i}"
+        elif type(imdb_id) is str:
+            request += f"&externalId.imdb={imdb_id}"
+        else:
+            raise TypeError('Only str and list are supported for \'imdb_id\'')
 
         response = self._send(request)
 
-        try:
-            movie = response["docs"][0]
-        except (KeyError, IndexError):
-            raise KPMovieNotFoundExc
+        movies = None
 
-        return self._get_movie_object(movie)
+        if type(imdb_id) is list:
+            movies = response["docs"]
+            new_movies = []
+            for m in movies:
+                new_movies.append(self._get_movie_object(m))
+            return new_movies
+        elif type(imdb_id) is str:
+            try:
+                movies = response["docs"][0]
+            except (KeyError, IndexError):
+                raise KPMovieNotFoundExc
+
+            return self._get_movie_object(movies)
+
+    @staticmethod
+    def get_kp_index_from_kinopoisk_data(kp_data, imdb_id):
+        index = 0
+        for m in kp_data:
+            if m['imdbId'] == imdb_id:
+                return index
+            index += 1
+        raise KPIndexNotFoundExc
+

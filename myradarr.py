@@ -44,28 +44,35 @@ class MyRadarr(RadarrAPI):
             movies_array.append(movie)
 
         movies_array = self._sort_movie_list(movies_array)
+        # Limit movies list to 'limit' var
+        movies_array = movies_array[:limit]
 
         self.last_found_movies = len(movies_array)
 
-        counter = limit
+        movies_array = self.populate_kinopoisk_data(movies_array)
+
+        return movies_array
+
+    def populate_kinopoisk_data(self, movies_array):
+        imdbs = []
+        for m in movies_array:
+            imdbs.append(m['imdbId'])
+
+        kp_info = self.kpapi.find_movies_by_imdb_id(imdbs)
 
         new_movies_array = []
         for m in movies_array:
-            if counter == 0:
-                break
-            counter -= 1
-
             try:
-                kp_info = self.kpapi.find_movie_by_imdb_id(m['imdbId'])
-            except KPMovieNotFoundExc:
+                kp_info_id = self.kpapi.get_kp_index_from_kinopoisk_data(kp_info, m['imdbId'])
+            except KPIndexNotFoundExc:
+                new_movies_array.append(m)
                 continue
-
-            m['scores'] += f"\nKinopoisk: {kp_info['rating']}"
+            m['scores'] += f"\nKinopoisk: {kp_info[kp_info_id]['rating']}"
             try:
-                m['trailer'] = kp_info['trailer']
+                m['trailer'] = kp_info[kp_info_id]['trailer']
             except KeyError:
                 pass
-            m['kpId'] = kp_info['id']
+            m['kpId'] = kp_info[kp_info_id]['id']
 
             new_movies_array.append(m)
 
