@@ -89,9 +89,14 @@ def get_text_messages(message):
         btn_types = telebot.types.InlineKeyboardButton(text='Скачать', callback_data=str(m['tmdbId']))
         kb.add(btn_types)
 
-        bot.send_photo(message.from_user.id, photo=m['image_url'], caption=m['title'], reply_markup=kb)
-        bot.send_message(message.from_user.id, f"{m['overview']}\n")
-        bot.send_message(message.from_user.id, f"{m['scores']}")
+        movie_message = f"{m['title']}\n\n{m['overview']}\n\n{m['scores']}"
+        movie_message = telebot.formatting.escape_markdown(movie_message)
+
+        if 'trailer' in m:
+            movie_message += f"\n\n[Трейлер]({telebot.formatting.escape_markdown(m['trailer'])})\n"
+
+        bot.send_photo(message.from_user.id, photo=m['image_url'], caption=movie_message, reply_markup=kb,
+                       parse_mode='MarkdownV2')
 
 
 @bot.callback_query_handler(func=lambda call: True)
