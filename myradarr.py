@@ -32,9 +32,6 @@ class MyRadarr(RadarrAPI):
             movie['scores'] = ""
             if 'imdb' in m['ratings']:
                 movie['scores'] += f"IMDB: {m['ratings']['imdb']['value']}"
-            else:
-                # Skip movie if no IMDB rating
-                continue
             if 'tmdb' in m['ratings']:
                 if len(movie['scores']) != 0:
                     movie['scores'] += " "
@@ -60,6 +57,8 @@ class MyRadarr(RadarrAPI):
         for m in movies_array:
             imdbs.append(m['imdbId'])
 
+        # TODO: Maybe should do using original movie name + year
+
         kp_info = self.kpapi.find_movies_by_imdb_id(imdbs)
 
         new_movies_array = []
@@ -69,6 +68,7 @@ class MyRadarr(RadarrAPI):
             except KPIndexNotFoundExc:
                 new_movies_array.append(m)
                 continue
+
             m['scores'] += f"\nKinopoisk: {kp_info[kp_info_id]['rating']}"
             try:
                 m['trailer'] = kp_info[kp_info_id]['trailer']

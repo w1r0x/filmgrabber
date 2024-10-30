@@ -24,7 +24,10 @@ class KPApi():
         movie = dict()
         movie["id"] = kp_api_response["id"]
         movie["rating"] = math.ceil(float(kp_api_response["rating"]["kp"])*10)/10
-        movie["imdbId"] = kp_api_response['externalId']['imdb']
+        try:
+            movie["imdbId"] = kp_api_response['externalId']['imdb']
+        except KeyError:
+            movie["imdbId"] = 0
         try:
             movie["trailer"] = kp_api_response["videos"]["trailers"][0]["url"]
         except (KeyError, IndexError):
