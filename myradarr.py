@@ -32,14 +32,15 @@ class MyRadarr(RadarrAPI):
             movie['scores'] = ""
             if 'imdb' in m['ratings']:
                 movie['scores'] += f"IMDB: {m['ratings']['imdb']['value']}"
+                movie['imdbId'] = m['imdbId']
             if 'tmdb' in m['ratings']:
                 if len(movie['scores']) != 0:
                     movie['scores'] += " "
                 movie['scores'] += f"TMDB: {m['ratings']['tmdb']['value']}"
+                movie['tmdbId'] = m['tmdbId']
             if len(movie['scores']) == 0:
                 del movie['scores']
-            movie['tmdbId'] = m['tmdbId']
-            movie['imdbId'] = m['imdbId']
+
             movies_array.append(movie)
 
         movies_array = self._sort_movie_list(movies_array)
@@ -55,17 +56,19 @@ class MyRadarr(RadarrAPI):
     def populate_kinopoisk_data(self, movies_array):
         imdbs = []
         for m in movies_array:
+            # Skip searching movie in KP if no imdbId
+            if 'imdbId' not in m:
+                continue
             imdbs.append(m['imdbId'])
 
         # TODO: Maybe should do using original movie name + year
-
         kp_info = self.kpapi.find_movies_by_imdb_id(imdbs)
 
         new_movies_array = []
         for m in movies_array:
             try:
                 kp_info_id = self.kpapi.get_kp_index_from_kinopoisk_data(kp_info, m['imdbId'])
-            except KPIndexNotFoundExc:
+            except (KPIndexNotFoundExc, KeyError):
                 new_movies_array.append(m)
                 continue
 
